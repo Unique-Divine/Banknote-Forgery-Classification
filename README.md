@@ -1,5 +1,4 @@
-"# Decision-Tree" 
-"# Decision-Tree" 
+# Decision-Tree 
 
 Writing decision trees from scratch can serve as an effective technical exercise in data preprocessing and recursion.
 
