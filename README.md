@@ -1,6 +1,6 @@
-# Decision-Tree 
+# Banknote Forgery Classification - Decision Tree from Scratch
 
-Writing decision trees from scratch can serve as an effective technical exercise in data preprocessing and recursion.
+The goal of this project was to get practice writing a decision tree from scratch. I figured that this could serve as an effective technical exercise.
 
 ## **Data Description**:
 Extracted from images were taken from genuine and forged banknote-like specimens. For digitization, an industrial camera usually used for print inspection was used. The final images have 400x 400 pixels. Due to the object lens and distance to the investigated object gray-scale pictures with a resolution of about 660 dpi were gained. Wavelet Transform tool were used to extract features from images.
