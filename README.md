@@ -11,3 +11,6 @@ Extracted from images were taken from genuine and forged banknote-like specimens
 3. curtosis of Wavelet Transformed image (continuous)
 4. entropy of image (continuous)
 5. class (integer)
+
+## Next Step:
+The decision tree is done, but I'd like to try to implement a random forest using the decision tree class. 
