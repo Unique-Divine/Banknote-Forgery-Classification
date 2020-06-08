@@ -14,4 +14,4 @@ Extracted from images were taken from genuine and forged banknote-like specimens
 
 ## Next Step / To-Do:
 * The decision tree is done, but I'd like to try to implement a random forest using the decision tree class. 
-* Afterward, I'll turn this entire repo into a tutorial, so people won't have to struggle as much as I did to understand some of the concepts involved writing a random forest algorithm.   
+* Afterward, I'll turn this entire repo into a tutorial, so people won't have to struggle as much as I did to understand some of the concepts and terminology involved in writing a random forest algorithm.   
