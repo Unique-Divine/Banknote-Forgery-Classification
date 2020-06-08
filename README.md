@@ -1,4 +1,4 @@
-# Banknote Forgery Classification - Decision Tree from Scratch
+# Banknote Fraud Classification - Decision Tree from Scratch
 ## Summary: ##
 The goal of this project was to get practice writing a decision tree from scratch. I figured that this could serve as an effective technical exercise.
  
