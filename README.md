@@ -12,5 +12,6 @@ Extracted from images were taken from genuine and forged banknote-like specimens
 4. entropy of image (continuous)
 5. class (integer)
 
-## Next Step:
-The decision tree is done, but I'd like to try to implement a random forest using the decision tree class. 
+## Next Step / To-Do:
+* The decision tree is done, but I'd like to try to implement a random forest using the decision tree class. 
+* Afterward, I'll turn this entire repo into a tutorial, so people won't have to struggle as much as I did to understand some of the concepts involved writing a random forest algorithm.   
