@@ -1,18 +1,28 @@
 import numpy as np
 from uncertainty import entropy, gini
+# Type imports
+from numpy import ndarray
 
 class Node:
-    """Each node of our decision tree will hold values such as left
-    and right children, the data and labels being split on, the 
-    threshold value & index in the dataframe for a particular 
-    feature, and the uncertainty measure for this node"""
-    def __init__(self, data, labels, depth):
-        """
-        Args: 
-            data: Input data, X.
-            labels: Target vectors, Y. 
-            depth: Tree depth. 
-        """
+    """A node in the decision tree. Each node of a tree has attributes such as
+    left and right children, the data and class labels to split on, a 
+    threshold value, threshold feature index, and an uncertainty measure.
+    
+    Args:
+        data (Array): Input data, X.
+        labels (Array): Target vectors, Y.
+        depth (int): Tree depth. The root node starts at depth 0.
+    
+    Attributes:
+        left (Node): Left child node. Defaults to None.
+        right (Node): Right child node. Defaults to None.
+        threshold (float):
+        threshold_idx (int): Index in the dataframe for a particular feature.
+        feature_col_idx (int): Feature column number 
+        label: 
+        uncertainty: Uncertainty measure for the node. 
+    """
+    def __init__(self, data: ndarray, labels: ndarray, depth: int):
         self.left = None
         self.right = None
 
@@ -20,54 +30,56 @@ class Node:
         self.labels = labels
         self.depth = depth
 
-        self.threshold = None # threshold value
-        self.threshold_index = None # threshold index
-        self.feature = None # feature as a NUMBER (column number)
+        self.threshold: float = None # threshold value
+        self.threshold_idx: int = None # threshold index
+        self.feature_col_idx = None # feature as a NUMBER (column number)
         self.label = None # y label
         self.uncertainty = None # uncertainty value
 
 class DecisionTree:
+    """
+    Args:
+        K (int): number of features to split on 
+    """
     def __init__(self, K=5, verbose=False):
-        """
-        K: number of features to split on 
-        """
+
         self.root = None
         self.K = K
         self.verbose = verbose
 
-    def buildTree(self, data, labels):
+    def buildTree(self, data: ndarray, labels: ndarray):
         """Builds tree for training on data. Recursively called _buildTree"""
-        self.root = Node(data, labels, 0)
+        self.root = Node(data = data, labels = labels, depth = 0)
         if self.verbose:
             print("Root node shape: ", data.shape, labels.shape)
         self._buildTree(self.root)
 
-    def _buildTree(self, node):
-        # get uncertainty measure and feature threshold
+    def _buildTree(self, node: Node):
+        # Get uncertainty measure and feature threshold
         node.uncertainty = self.get_uncertainty(node.labels)
-        self.get_feature_threshold(node)
+        self.set_feature_threshold(node)
         
-        # sort feature for return
-        index = node.data[:, node.feature].argsort()
-        node.data = node.data[index]
-        node.labels = node.labels[index]      
+        # Sort feature for return
+        idx = node.data[:, node.feature_col_idx].argsort()
+        node.data = node.data[idx]
+        node.labels = node.labels[idx]      
         
         label_distribution = np.bincount(node.labels)       
         if self.verbose:
-            print("Node uncertainty: %f" % node.uncertainty)
+            print(f"Node uncertainty: {node.uncertainty}")
         
         # Split left and right if threshold is not a minima of the feature 
-        if (node.threshold_index == 0 or 
-            node.threshold_index == node.data.shape[0] or
+        if (node.threshold_idx == 0 or 
+            node.threshold_idx == node.data.shape[0] or
             len(label_distribution) == 1):
             node.label = (node.labels[0] if len(label_distribution) == 1 
                           else np.argmax(label_distribution) )
         else:
-            node.left = Node(node.data[:node.threshold_index],
-                             node.labels[:node.threshold_index],
+            node.left = Node(node.data[:node.threshold_idx],
+                             node.labels[:node.threshold_idx],
                              node.depth + 1)
-            node.right = Node(node.data[node.threshold_index:],
-                              node.labels[node.threshold_index:],
+            node.right = Node(node.data[node.threshold_idx:],
+                              node.labels[node.threshold_idx:],
                               node.depth + 1)
             node.data = None
             node.labels = None
@@ -92,64 +104,65 @@ class DecisionTree:
     def predict(self, data_pt):
         return self._predict(data_pt, self.root)
 
-    def _predict(self, data_pt, node):
-        feature = node.feature
+    def _predict(self, data_pt, node: Node):
+        feature = node.feature_col_idx
         threshold = node.threshold
         if node.label is not None:
             return node.label
-        elif data_pt[node.feature] < node.threshold:
+        elif data_pt[node.feature_col_idx] < node.threshold:
             return self._predict(data_pt, node.left)
-        elif data_pt[node.feature] >= node.threshold:
+        elif data_pt[node.feature_col_idx] >= node.threshold:
             return self._predict(data_pt, node.right)
 
-    def get_feature_threshold(self, node):
-        """ This function finds the feature that gives the largest information
-        gain, then updates node.threshold, node.threshold_index, and 
-        node.feature, a number representing the feature.
+    def set_feature_threshold(self, node: Node) -> None:
+        """Finds the feature corresponding to the largest information
+        gain, then updates node.threshold, node.threshold_idx, and 
+        node.feature_col_idx, a number representing the feature.
         
-        return: None
+        Returns: 
+            None
         """
         node.threshold = 0
-        node.threshold_index = 0
-        node.feature = 0
+        node.threshold_idx = 0
+        node.feature_col_idx = 0
 
-        gain, index, feature = 0, 0, 0 
+        gain, idx, feature = 0, 0, 0 
         for k in range(len(node.data[0])):
             d = np.argsort(node.data[:, k])
             node.labels = node.labels[d]
             node.data = node.data[d]
             for j in range(len(node.data)):
                 if self.getInfoGain(node, j) > gain:
-                    gain, index, feature = self.getInfoGain(node, j), j, k
+                    gain, idx, feature = self.getInfoGain(node, j), j, k
         feat = np.argsort(node.data[:, feature])
         node.data = node.data[feat]
         node.labels = node.labels[feat]
         
-        node.threshold = node.data[index, feature]
-        node.threshold_index = index
-        node.feature = feature 
+        node.threshold = node.data[idx, feature]
+        node.threshold_idx = idx
+        node.feature_col_idx = feature 
 
-    def getInfoGain(self, node, split_index):
-        """Gets information gain at a given node (decision) in the tree.
+    def getInfoGain(self, node: Node, split_idx: int) -> float:
+        """Gets the information gain at a given node (decision) in the tree.
 
         Args:
-            node (Node): The node at which the information gain will be evaluated.
-            split_index (int): Index in the feature column that we 
+            node (Node): The node at which information gain will be evaluated.
+            split_idx (int): Index in the feature column that we 
                 split the classes on
 
         Returns:
             infogain (float): information gain
         """
-        left_uncertainty = self.get_uncertainty(node.labels[:split_index]) 
-        right_uncertainty = self.get_uncertainty(node.labels[split_index:])
+        left_uncertainty = self.get_uncertainty(node.labels[:split_idx]) 
+        right_uncertainty = self.get_uncertainty(node.labels[split_idx:])
         
         n = len(node.labels)
-        w1 = left_uncertainty * (split_index + 1) / n
-        w2 = right_uncertainty * (n - (split_index + 1)) / n
+        w1 = left_uncertainty * (split_idx + 1) / n
+        w2 = right_uncertainty * (n - (split_idx + 1)) / n
         
         start_entropy = self.get_uncertainty(node.labels)
         conditional_entropy = w1 + w2 
-        infogain = start_entropy - conditional_entropy
+        infogain: float = start_entropy - conditional_entropy
         return infogain
 
     def get_uncertainty(self, labels, metric="gini"):
@@ -171,19 +184,19 @@ class DecisionTree:
         
         return uncertainty
 
-    def printTree(self):
+    def print_tree(self):
         """Prints the tree including threshold value and feature name"""
-        self._printTree(self.root)
+        self._print_tree(node = self.root)
 
-    def _printTree(self, node):
+    def _print_tree(self, node: Node):
         if node is not None:
             if node.label is None:
                 print("\t" * node.depth, "(%d, %d)" 
-                      % (node.threshold, node.feature))
+                      % (node.threshold, node.feature_col_idx))
             else:
                 print("\t" * node.depth, node.label)
-            self._printTree(node.left)
-            self._printTree(node.right)
+            self._print_tree(node.left)
+            self._print_tree(node.right)
 
     def tree_evaluate(self, X_train, labels, X_test, y_test, verbose=False): 
         #---------
