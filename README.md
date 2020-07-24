@@ -1,6 +1,6 @@
-# Banknote Fraud Classification - Decision Tree from Scratch
+# Banknote Fraud Classification - Decision Trees from Scratch
 ## Summary: ##
-The goal of this project was to get practice writing a decision tree from scratch. I figured that this could serve as an effective technical exercise.
+The goal of this project was to detect fraudulent banknotes. I figured that classifying the banknotes with decision trees written from scratch could serve as an effective technical exercise.
  
 ## Data Description:
 Extracted from images were taken from genuine and forged banknote-like specimens. For digitization, an industrial camera usually used for print inspection was used. The final images have 400x 400 pixels. Due to the object lens and distance to the investigated object gray-scale pictures with a resolution of about 660 dpi were gained. Wavelet Transform tool were used to extract features from images.
@@ -14,4 +14,4 @@ Extracted from images were taken from genuine and forged banknote-like specimens
 
 ## Next Step / To-Do:
 * The decision tree is done, but I'd like to try to implement a random forest using the decision tree class. 
-* Afterward, I'll turn this entire repo into a tutorial, so people won't have to struggle as much as I did to understand some of the concepts and terminology involved in writing a random forest algorithm.   
+* Afterward, I'll turn this entire repo into a tutorial, so people won't have to struggle as much as I did to understand some of these concepts.   
